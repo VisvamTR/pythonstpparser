@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STP File Upload and Conversion</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px 0;
+            margin: 0;
+            font-size: 2em;
+        }
+
+        form {
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        input[type="file"] {
+            font-size: 1em;
+            margin: 10px 0 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #message, #downloadLink {
+            margin-top: 20px;
+            font-size: 1.1em;
+        }
+
+        #downloadLink a {
+            text-decoration: none;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        #downloadLink a:hover {
+            color: #388E3C;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.5em;
+                padding: 15px 0;
+            }
+
+            form {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 0.9em;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Upload STP File for Conversion</h1>
+
+    <form id="uploadForm" enctype="multipart/form-data">
+        <label for="file">Choose .stp file:</label>
+        <input type="file" name="file" id="file" accept=".stp" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <div id="message"></div>
+    <div id="downloadLink"></div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = '/download/' + data.filename;
+                    downloadLink.innerText = 'Click here to download the converted file';
+                    document.getElementById('downloadLink').innerHTML = ''; // Clear previous link
+                    document.getElementById('downloadLink').appendChild(downloadLink);
+                } else {
+                    document.getElementById('message').innerText = 'Error: ' + data.error;
+                    document.getElementById('downloadLink').innerHTML = ''; // Clear previous link
+                }
+            })
+            .catch(error => {
+                document.getElementById('message').innerText = 'Error: ' + error;
+                document.getElementById('downloadLink').innerHTML = ''; // Clear previous link
+            });
+        });
+    </script>
+
+</body>
+</html>
